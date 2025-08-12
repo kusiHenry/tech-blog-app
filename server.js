@@ -31,3 +31,8 @@ app.use(routes);
 sequelize.sync({ force: rebuild }).then(() => {
   app.listen(PORT, () => console.log("Now listening"));
 });
+
+// Fallback to index.html (for single page apps)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});

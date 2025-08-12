@@ -13,23 +13,20 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
-// GET the User record
+// GET a user by ID
 router.get("/:id", async (req, res) => {
-  console.log("looking for user", req.params.id);
   try {
-    const userData = await User.getOne(req.params.id);
-
-    if (!userData) {
-      res.status(404).json({ message: "No User found with this id" });
-      return;
+    const user = await User.getOne(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "No user found with this id" });
     }
-
-    res.status(200).json(userData);
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
+// GET all users (auth protected)
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const users = await User.findAll();
@@ -39,64 +36,63 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
+// Register (Create new user)
 router.post("/", async (req, res) => {
   try {
-    const userData = await User.create(req.body);
-
-    const token = signToken(userData);
-    res.status(200).json({ token, userData });
+    const user = await User.create(req.body);
+    const token = signToken(user);
+    res.status(200).json({ token, user });  // 🔁 changed from userData → user
   } catch (err) {
     res.status(400).json(err);
   }
 });
 
-// UDPATE the User record
+// Update user
 router.put("/:id", async (req, res) => {
   try {
-    const userData = await User.update(req.body, {
-      where: {
-        id: req.params.id,
-      },
+    const user = await User.update(req.body, {
+      where: { id: req.params.id },
     });
 
-    if (!userData) {
-      res.status(404).json({ message: "No User found with this id" });
-      return;
+    if (!user) {
+      return res.status(404).json({ message: "No user found with this id" });
     }
 
-    res.status(200).json(userData);
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
+// Login
 router.post("/login", async (req, res) => {
   try {
-    const userData = await User.findOne({ where: { email: req.body.email } });
-    if (!userData) {
-      res
-        .status(400)
-        .json({ message: "Incorrect email or password, please try again" });
-      return;
+    const user = await User.findOne({ where: { email: req.body.email } });
+    if (!user) {
+      return res.status(400).json({ message: "Incorrect email or password" });
     }
 
-    const validPassword = await userData.checkPassword(req.body.password);
-
+    const validPassword = await user.checkPassword(req.body.password);
     if (!validPassword) {
-      res
-        .status(400)
-        .json({ message: "Incorrect email or password, please try again" });
-      return;
+      return res.status(400).json({ message: "Incorrect email or password" });
     }
 
-    const token = signToken(userData);
-    res.status(200).json({ token, userData });
+    const token = signToken(user);
+    res.status(200).json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
   } catch (err) {
-    console.log(err);
-    res.status(400).json(err);
+    console.error(err);
+    res.status(400).json({ message: "Login error", error: err.message });
   }
 });
 
+// Logout
 router.post("/logout", (req, res) => {
   res.status(204).end();
 });

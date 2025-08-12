@@ -14,25 +14,25 @@
         <input type="text" id="username" placeholder="Username">
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="register()">Register</button>
+        <button id="register-btn">Register</button>
         <hr>
         <h2>Login</h2>
         <input type="email" id="login-email" placeholder="Email">
         <input type="password" id="login-password" placeholder="Password">
-        <button onclick="login()">Login</button>
+        <button id="login-btn">Login</button>
     </div>
 
     <div class="container hidden" id="app-container">
         <h2>Welcome</h2>
-        <button onclick="logout()">Logout</button>
+        <button id="logout-btn">Logout</button>
         <hr>
         <h2>Create a Post</h2>
         <input type="text" id="post-title" placeholder="Title">
         <textarea id="post-content" placeholder="Content"></textarea>
-        <button onclick="createPost()">Submit Post</button>
+        <button id="create-post-btn">Submit Post</button>
         <hr>
         <h2>Posts</h2>
-        <button onclick="fetchPosts()">Load Posts</button>
+        <button id="load-posts-btn">Load Posts</button>
         <div id="posts"></div>
     </div>
 
